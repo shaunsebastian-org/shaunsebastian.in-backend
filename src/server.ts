@@ -17,6 +17,11 @@ import messageRoutes from './routes/messageRoutes';
 import adminRoutes from './routes/adminRoutes';
 
 dotenv.config();
+
+console.log('🚀 Starting server...');
+console.log('Environment:', process.env.NODE_ENV);
+console.log('MongoDB URI configured:', !!process.env.MONGO_URI);
+
 connectDB();
 
 const app = express();
@@ -26,7 +31,20 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.json({
+    status: 'success',
+    message: 'API is running...',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.use('/api/auth', authRoutes);
@@ -40,8 +58,8 @@ app.use('/api/admin', adminRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });
