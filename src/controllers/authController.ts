@@ -12,20 +12,26 @@ const generateToken = (id: string) => {
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+
+    console.log('Registration attempt:', { name, email, role });
 
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      res.status(400);
-      throw new Error('User already exists');
+      console.log('User already exists:', email);
+      res.status(400).json({ message: 'User already exists' });
+      return;
     }
 
     const user = await User.create({
       name,
       email,
       password,
+      role,
     });
+
+    console.log('User created successfully:', user._id);
 
     if (user) {
       res.status(201).json({
@@ -36,51 +42,58 @@ export const registerUser = async (req: Request, res: Response) => {
         token: generateToken(user._id.toString()),
       });
     } else {
-      res.status(400);
-      throw new Error('Invalid user data');
+      res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
-      res.status(400);
-      const err = error as Error;
-      throw new Error(err.message, { cause: error });
-    }
+    const err = error as Error;
+    console.error('Registration error:', err);
+    res.status(400).json({ message: err.message || 'Failed to create account' });
+  }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-  if (user && (await user.comparePassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id.toString()),
-    });
-  } else {
-    res.status(401);
-    throw new Error('Invalid email or password');
+    if (user && (await user.comparePassword(password))) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user._id.toString()),
+      });
+    } else {
+      res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    const err = error as Error;
+    res.status(500).json({ message: err.message || 'Login failed' });
   }
 };
 
 export const getMe = async (req: AuthRequest, res: Response) => {
-  if (!req.user) {
-    res.status(401);
-    throw new Error('Not authorized');
-  }
-  const user = await User.findById(req.user.id);
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: 'Not authorized' });
+      return;
+    }
+    const user = await User.findById(req.user.id);
 
-  if (user) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    });
-  } else {
-    res.status(404);
-    throw new Error('User not found');
+    if (user) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    const err = error as Error;
+    res.status(500).json({ message: err.message || 'Failed to get user' });
   }
 };

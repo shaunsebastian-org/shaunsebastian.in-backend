@@ -2,6 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+
+dotenv.config();
+
 import connectDB from './config/db';
 import { notFound, errorHandler } from './middleware/errorMiddleware';
 
