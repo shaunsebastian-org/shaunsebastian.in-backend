@@ -28,8 +28,10 @@ export const getProjectById = async (req: Request, res: Response) => {
 
 export const createProject = async (req: Request, res: Response) => {
   try {
+    console.log('Creating project with data:', req.body);
     const project = new Project(req.body);
     const createdProject = await project.save();
+    console.log('Project created successfully:', createdProject._id);
     res.status(201).json(createdProject);
   } catch (error) {
     const err = error as Error;
