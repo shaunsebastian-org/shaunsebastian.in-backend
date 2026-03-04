@@ -28,7 +28,7 @@ const seedData = async () => {
     });
 
     // Create Sample Projects
-    await Project.create([
+    const projects = [
       {
         title: 'E-Commerce Platform',
         description: 'A modern e-commerce platform with real-time inventory management and payment processing.',
@@ -60,10 +60,11 @@ const seedData = async () => {
         completionDate: new Date('2024-03-10'),
         featured: false,
       },
-    ]);
+    ];
+    await Project.insertMany(projects);
 
     // Create Sample Blogs
-    await Blog.create([
+    const blogs = [
       {
         title: 'The Future of Web Development',
         content: 'Exploring the latest trends and technologies shaping the future of web development. From AI integration to progressive web apps, discover what\'s next in the digital landscape.',
@@ -88,10 +89,11 @@ const seedData = async () => {
         slug: 'modern-ui-ux-design-principles',
         published: true,
       },
-    ]);
+    ];
+    await Blog.insertMany(blogs);
 
     // Create Sample Services
-    await Service.create([
+    const services = [
       {
         title: 'Web Development',
         description: 'Custom web applications built with modern frameworks and best practices for optimal performance and user experience.',
@@ -128,10 +130,11 @@ const seedData = async () => {
         icon: 'ShieldCheck',
         features: ['Security Audits', 'Penetration Testing', 'Compliance', 'Threat Monitoring'],
       },
-    ]);
+    ];
+    await Service.insertMany(services);
 
     // Create Sample Testimonials
-    await Testimonial.create([
+    const testimonials = [
       {
         name: 'John Smith',
         position: 'CEO, Tech Corp',
@@ -148,7 +151,8 @@ const seedData = async () => {
         rating: 5,
         image: 'https://i.pravatar.cc/150?img=45',
       },
-    ]);
+    ];
+    await Testimonial.insertMany(testimonials);
 
     console.log('✅ Data Seeded Successfully');
     console.log(`Created ${admin.name} with email: ${admin.email}`);
